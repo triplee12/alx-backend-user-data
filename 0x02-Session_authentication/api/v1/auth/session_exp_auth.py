@@ -7,8 +7,7 @@ from api.v1.auth.session_auth import SessionAuth
 
 
 class SessionExpAuth(SessionAuth):
-    """ SessionExpAuth class.
-    """
+    """SessionExpAuth class."""
 
     def __init__(self):
         """Initialize session."""
