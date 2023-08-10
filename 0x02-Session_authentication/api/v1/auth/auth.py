@@ -2,16 +2,15 @@
 """Auth class."""
 
 from flask import request
+from os import getenv
 from typing import List, TypeVar
 
 
 class Auth:
-    """ Auth class.
-    """
+    """ Authentication."""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """Require authentication.
-        """
+        """Require authentication."""
         if not path or not excluded_paths:
             return True
         path = path + '/' if path[-1] != '/' else path
@@ -27,12 +26,16 @@ class Auth:
         return True
 
     def authorization_header(self, request=None) -> str:
-        """Authorization header.
-        """
+        """Authorization header."""
         if request:
             return request.headers.get("Authorization")
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """Current user.
-        """
+        """Current user."""
         return None
+
+    def session_cookie(self, request=None):
+        """Session cookie."""
+        if request:
+            session_name = getenv("SESSION_NAME")
+            return request.cookies.get(session_name, None)
