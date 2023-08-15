@@ -7,7 +7,9 @@ from user import User
 
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
+from auth import _hash_password
 
+print(_hash_password("Hello Holberton"))
 
 my_db = DB()
 
