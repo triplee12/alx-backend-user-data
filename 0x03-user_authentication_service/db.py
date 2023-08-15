@@ -28,13 +28,12 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str):
+    def add_user(self, email: str, hashed_password: str) -> User:
         """Add a user to the database."""
-        if email and hashed_password:
-            user = User(email=email, hashed_password=hashed_password)
-            self._session.add(user)
-            self._session.commit()
-            return user
+        user = User(email=email, hashed_password=hashed_password)
+        self._session.add(user)
+        self._session.commit()
+        return user
 
     def find_user_by(self, **kwargs) -> User:
         """Find user by email."""
@@ -46,3 +45,13 @@ class DB:
             return user
         except InvalidRequestError as invalid:
             raise invalid
+
+    def update_user(self, user_id: int, **kwargs):
+        """Update a user."""
+        user = self.find_user_by(id=user_id)
+        if user:
+            new_user_data = self._session.query(User).filter(
+                User.id == user_id
+            )
+            new_user_data.update(kwargs)
+            self._session.commit()
