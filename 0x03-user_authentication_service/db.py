@@ -2,9 +2,11 @@
 """DB module."""
 
 from sqlalchemy import create_engine
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm.exc import NoResultFound  # InvalidRequestError
 from user import Base, User
 
 
@@ -33,3 +35,14 @@ class DB:
             self._session.add(user)
             self._session.commit()
             return user
+
+    def find_user_by(self, **kwargs) -> User:
+        """Find user by email."""
+        try:
+            query = self._session.query(User).filter_by(**kwargs)
+            user = query.first()
+            if not user:
+                raise NoResultFound("No user found matching the query.")
+            return user
+        except InvalidRequestError as invalid:
+            raise invalid
