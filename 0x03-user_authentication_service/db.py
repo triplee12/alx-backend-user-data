@@ -9,6 +9,11 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound  # InvalidRequestError
 from user import Base, User
 
+VALID_FIELDS = [
+    'id', 'email', 'hashed_password',
+    'session_id', 'reset_token'
+]
+
 
 class DB:
     """DB class."""
@@ -30,28 +35,32 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """Add a user to the database."""
+        if not email or not hashed_password:
+            return
         user = User(email=email, hashed_password=hashed_password)
-        self._session.add(user)
-        self._session.commit()
+        sess = self._session
+        sess.add(user)
+        sess.commit()
         return user
 
     def find_user_by(self, **kwargs) -> User:
         """Find user by email."""
+        if not kwargs or any(x not in VALID_FIELDS for x in kwargs):
+            raise InvalidRequestError
+        sess = self._session
         try:
-            query = self._session.query(User).filter_by(**kwargs)
-            user = query.first()
-            if not user:
-                raise NoResultFound("No user found matching the query.")
+            query = sess.query(User).filter_by(**kwargs)
+            user = query.one()
             return user
-        except InvalidRequestError as invalid:
-            raise invalid
+        except NoResultFound as no_result:
+            raise no_result
 
-    def update_user(self, user_id: int, **kwargs):
+    def update_user(self, user_id: int, **kwargs) -> None:
         """Update a user."""
+        sess = self._session
         user = self.find_user_by(id=user_id)
-        if user:
-            new_user_data = self._session.query(User).filter(
-                User.id == user_id
-            )
-            new_user_data.update(kwargs)
-            self._session.commit()
+        for k, v in kwargs.items():
+            if k not in VALID_FIELDS:
+                raise ValueError
+            setattr(user, k, v)
+        sess.commit()
