@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
-def welcome() -> str:
+def index() -> str:
     """
     Home page.
 
@@ -17,7 +17,7 @@ def welcome() -> str:
     Return:
         - welcome
     """
-    return jsonify({"message": "Bienvenue"}), 200
+    return jsonify({"message": "Bienvenue"})
 
 
 @app.route('/users', methods=['POST'], strict_slashes=False)
@@ -33,9 +33,9 @@ def users() -> str:
     password = request.form.get('password')
     try:
         AUTH.register_user(email, password)
-        return jsonify({"email": f"{email}", "message": "user created"}), 200
+        return jsonify({"email": f"{email}", "message": "user created"})
     except Exception:
-        return jsonify({"message": "email already registered"}), 400
+        return jsonify({"message": "email already registered"})
 
 
 @app.route('/sessions', methods=['POST'], strict_slashes=False)
@@ -89,7 +89,7 @@ def profile() -> str:
     session_id = request.cookies.get('session_id')
     usr = AUTH.get_user_from_session_id(session_id)
     if usr:
-        return jsonify({"email": usr.email}), 200
+        return jsonify({"email": usr.email})
     else:
         abort(403)
 
