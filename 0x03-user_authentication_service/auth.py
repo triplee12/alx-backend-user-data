@@ -4,6 +4,7 @@
 from bcrypt import hashpw, gensalt
 from sqlalchemy.orm.exc import NoResultFound
 from db import DB
+from user import User
 
 
 def _hash_password(password: str) -> bytes:
@@ -20,7 +21,7 @@ class Auth:
         """Initialize the authentication."""
         self._db = DB()
 
-    def register_user(self, email: str, password: str):
+    def register_user(self, email: str, password: str) -> User:
         """Register a user."""
         try:
             user = self._db.find_user_by(email=email)
